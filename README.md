@@ -14,3 +14,5 @@ Client          : Nginx → Flask App (Docker)
 Infrastructure  : Terraform
 Configuration   : Ansible
 CI/CD           : GitHub Actions
+
+CI test run - <25-01-2026>
