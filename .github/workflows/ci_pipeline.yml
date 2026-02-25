@@ -54,3 +54,19 @@ jobs:
         run: |
           terraform apply -auto-approve
           echo "VM_IP=$(terraform output -raw vm_public_ip)" >> $GITHUB_ENV
+
+      # ---------- Deploying to Azure VM ----------
+      - name: Deploy to Azure VM
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ env.VM_IP }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            docker pull adithravi/networking-app:${{ github.sha }}
+            docker stop networking-container || true
+            docker rm networking-container || true
+            docker run -d \
+              --name networking-container \
+              -p 80:5000 \
+              adithravi/networking-app:${{ github.sha }}
