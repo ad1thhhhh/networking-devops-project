@@ -47,35 +47,49 @@ The architecture follows **immutable infrastructure principles**, meaning infras
 ## Architecture Diagram
 
 ```
-Developer
-   │
-   ▼
-GitHub Repository (main branch)
-   │
-   ▼
-GitHub Actions CI/CD Pipeline
-   │
-   ├── Build Docker Image
-   ├── Push Image to DockerHub
-   └── Terraform Apply
-            │
-            ▼
-      Azure Infrastructure
-      ├── Resource Group
-      ├── Virtual Network
-      ├── Subnet
-      ├── Network Security Group
-      ├── Public IP
-      └── Linux Virtual Machine
+┌───────────────────────────────┐
+│          Developer            │
+└───────────────┬───────────────┘
+                │  Git Push
+                ▼
+┌───────────────────────────────┐
+│     GitHub Repository         │
+│        (main branch)          │
+└───────────────┬───────────────┘
+                │  Triggers
+                ▼
+┌──────────────────────────────────────────┐
+│        GitHub Actions CI/CD             │
+│------------------------------------------│
+│  • Build Docker Image                   │
+│  • Push Image to DockerHub              │
+│  • Terraform Init / Plan / Apply        │
+└───────────────┬──────────────────────────┘
                 │
                 ▼
-         Cloud-init (Auto Setup)
+┌──────────────────────────────────────────┐
+│          Microsoft Azure Cloud          │
+│------------------------------------------│
+│  • Resource Group                       │
+│  • Virtual Network                      │
+│  • Subnet                               │
+│  • Network Security Group               │
+│  • Public IP                            │
+│  • Linux Virtual Machine                │
+└───────────────┬──────────────────────────┘
+                │  cloud-init
+                ▼
+┌───────────────────────────────┐
+│     Docker Engine on VM      │
+│  • Pull latest image         │
+│  • Run container             │
+└───────────────┬───────────────┘
                 │
                 ▼
-        Docker Container Running App
-                │
-                ▼
-           Publicly Accessible Application
+┌───────────────────────────────┐
+│   Publicly Accessible App    │
+│     http://<public-ip>       │
+└───────────────────────────────┘
 ```
 ## Objective
 
