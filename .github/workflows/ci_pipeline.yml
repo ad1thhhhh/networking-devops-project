@@ -25,10 +25,10 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Building Docker Image
-        run: docker build -t adithravi/networking-app:latest ./app
+        run: docker build -t adithravi/networking-app:${{ github.sha }} ./app
 
       - name: Pushing Docker Image
-        run: docker push adithravi/networking-app:latest
+        run: docker push adithravi/networking-app:${{ github.sha }}
 
       # ---------- Logging in to Azure ----------
       - name: Azure Login
