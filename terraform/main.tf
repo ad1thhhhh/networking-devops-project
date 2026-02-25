@@ -113,19 +113,7 @@ resource "azurerm_linux_virtual_machine" "networking_vm" {
     public_key = file("${path.module}/id_rsa.pub")
   }
 
-  custom_data = base64encode(<<EOF
-#!/bin/bash
-apt update -y
-apt install docker.io -y
-systemctl enable docker
-systemctl start docker
-usermod -aG docker adithravi
-
-docker pull adithravi/networking-app:latest
-docker run -d -p 80:5000 --name networking-container adithravi/networking-app:latest
-EOF
-  )
-
+  
   os_disk {
     name                 = "networking-vm-osdisk"
     caching              = "ReadWrite"
@@ -138,8 +126,26 @@ EOF
     sku       = "22_04-lts"
     version   = "latest"
   }
+
+  provisioner "remote-exec" {
+  inline = [
+    "sudo apt update -y",
+    "sudo apt install -y docker.io",
+    "sudo systemctl enable docker",
+    "sudo systemctl start docker",
+    "sudo usermod -aG docker adithravi"
+  ]
+
+  connection {
+    type        = "ssh"
+    user        = "adithravi"
+    private_key = file(pathexpand("~/.ssh/id_rsa"))
+    host        = self.public_ip_address
+  }
+}
 }
 
 output "vm_public_ip" {
   value = azurerm_public_ip.public_ip.ip_address
 }
+z
