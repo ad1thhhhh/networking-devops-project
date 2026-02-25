@@ -148,4 +148,4 @@ resource "azurerm_linux_virtual_machine" "networking_vm" {
 output "vm_public_ip" {
   value = azurerm_public_ip.public_ip.ip_address
 }
-z
+
