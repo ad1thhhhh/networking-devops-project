@@ -127,22 +127,7 @@ resource "azurerm_linux_virtual_machine" "networking_vm" {
     version   = "latest"
   }
 
-  provisioner "remote-exec" {
-  inline = [
-    "sudo apt update -y",
-    "sudo apt install -y docker.io",
-    "sudo systemctl enable docker",
-    "sudo systemctl start docker",
-    "sudo usermod -aG docker adithravi"
-  ]
-
-  connection {
-    type        = "ssh"
-    user        = "adithravi"
-    private_key = file(pathexpand("~/.ssh/id_rsa"))
-    host        = self.public_ip_address
-  }
-}
+  
 }
 
 output "vm_public_ip" {
