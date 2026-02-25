@@ -1,4 +1,4 @@
-name: Ci Pipeline to Build and Push Docker Image
+name: CI/CD Pipeline to Build and Deploy
 
 on:
   push:
@@ -6,12 +6,22 @@ on:
       - main
 
 jobs:
-  build-and-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check Repository
+      - name: Check Code
         uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+        python-version: '3.9'
+
+      - name: Install Dependencies
+        run: |
+         cd app
+         pip install -r requirements.txt
 
       - name: Log in to DockerHub
         uses: docker/login-action@v2
@@ -26,3 +36,15 @@ jobs:
       - name: Push Docker Image
         run: |
           docker push adithravi/networking-app:latest
+
+      - name: Deploy to Azure VM
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            docker pull adithravi/networking-app:latest
+            docker stop networking-container || true
+            docker rm networking-container || true
+            docker run -d -p 80:5000 --name networking-container adithravi/networking-app:latest
