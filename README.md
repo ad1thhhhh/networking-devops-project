@@ -49,7 +49,7 @@ The architecture follows **immutable infrastructure principles**, meaning infras
 ```
                     ┌────────────────────────────┐
                     │        Developer           │
-                    │        Code Commit         │
+                    │       Code Commit          │
                     └─────────────┬──────────────┘
                                   │
                                   ▼
@@ -65,7 +65,7 @@ The architecture follows **immutable infrastructure principles**, meaning infras
 │  1. Checkout Source Code                                       │
 │  2. Build Docker Image                                         │
 │  3. Push Image to DockerHub                                    │
-│  4. Authenticate with Azure (OIDC / Service Principal)         │
+│  4. Authenticate with Azure ( Service Principal)         │
 │  5. Terraform Init → Plan → Apply                              │
 └─────────────┬──────────────────────────────────────────────────┘
               │
