@@ -41,7 +41,7 @@ def home():
                 <h1>🚀 Networking Project is Live!</h1>
                 <p>Welcome! Your Flask application is up and running successfully.</p>
                 <div class="footer">
-                    Builtusing FPython-Flask
+                    Built using Python-Flask
                 </div>
             </div>
         </body>
