@@ -4,7 +4,7 @@
   become: yes
 
   vars:
-    docker_image_name: "adithravi/networking-app:${{ github.sha }}"
+    docker_image_name: "{{ image_tag }}"
     container_name: networking-container
     container_port: 5000
     exposed_port: 80
