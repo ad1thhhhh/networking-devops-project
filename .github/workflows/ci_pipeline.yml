@@ -89,3 +89,15 @@ jobs:
               --name networking-container \
               -p 80:5000 \
               adithravi/networking-app:${{ github.sha }}
+
+      # ---------- Run Ansible Playbook ----------
+      - name: Run Ansible Playbook
+        uses: ansible/ansible-playbook-action@v2.0.0
+        with:
+          playbook: ansible/playbook.yml
+          inventory: ${{ env.VM_IP }},
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "False"
+          ANSIBLE_PRIVATE_KEY_FILE: ${{ secrets.VM_SSH_KEY }}
+          ANSIBLE_USER: ${{ secrets.VM_USER }}
+          image_tag: ${{ github.sha }}
