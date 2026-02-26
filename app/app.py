@@ -12,102 +12,142 @@ def home():
     <head>
         <title>Barista Task List ☕</title>
         <style>
-            body {
-                font-family: Arial;
-                background: #f4f1ea;
-                text-align: center;
-                padding: 50px;
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #3e2723, #795548);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            background: #fff8f2;
+            padding: 40px;
+            border-radius: 20px;
+            width: 400px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #4e342e;
+        }
+
+        input {
+            padding: 12px;
+            width: 70%;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            outline: none;
+        }
+
+        button {
+            padding: 10px 14px;
+            background: #6d4c41;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-left: 5px;
+        }
+
+        button:hover {
+            background: #5d4037;
+            transform: scale(1.05);
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        li {
+            background: white;
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             }
-            h1 {
-                color: #6b3e26;
-            }
-            input {
-                padding: 10px;
-                width: 250px;
-                border-radius: 5px;
-                border: 1px solid #ccc;
-            }
-            button {
-                padding: 8px 12px;
-                background: #6b3e26;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                margin-left: 5px;
-            }
-            ul {
-                list-style: none;
-                padding: 0;
-            }
-            li {
-                background: white;
-                margin: 10px auto;
-                padding: 10px;
-                width: 320px;
-                border-radius: 5px;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            }
-        </style>
+
+        s {
+        color: #999;
+        }
+    </style>
     </head>
-    <body>
-        <h1>☕ Barista Task List</h1>
+                <body>
+            <div class="card">
+                <h1>☕ Barista Task List</h1>
 
-        <input type="text" id="taskInput" placeholder="Enter new task">
-        <button onclick="addTask()">Add</button>
+                <div style="margin-bottom:20px;">
+                    <input type="text" id="taskInput" placeholder="Enter new barista task">
+                    <button onclick="addTask()">Add</button>
+                </div>
 
-        <ul id="taskList"></ul>
+                <ul id="taskList"></ul>
+            </div>
 
-        <script>
-            async function fetchTasks() {
-                const response = await fetch('/tasks');
-                const tasks = await response.json();
-                const list = document.getElementById('taskList');
-                list.innerHTML = '';
+            <script>
+                async function fetchTasks() {
+                    const response = await fetch('/tasks');
+                    const tasks = await response.json();
+                    const list = document.getElementById('taskList');
+                    list.innerHTML = '';
 
-                tasks.forEach(task => {
-                    const li = document.createElement('li');
+                    tasks.forEach(task => {
+                        const li = document.createElement('li');
 
-                    let text = task.task;
-                    if (task.status === "completed") {
-                        text = "<s>" + task.task + "</s>";
-                    }
+                        let text = task.task;
+                        if (task.status === "completed") {
+                            text = "<s>" + task.task + "</s>";
+                        }
 
-                    li.innerHTML = text +
-                        ' <button onclick="toggleTask(' + task.id + ')">✔</button>' +
-                        ' <button onclick="deleteTask(' + task.id + ')">❌</button>';
+                        li.innerHTML = `
+                            <span>${text}</span>
+                            <div>
+                                <button onclick="toggleTask(${task.id})">✔</button>
+                                <button onclick="deleteTask(${task.id})">❌</button>
+                            </div>
+                        `;
 
-                    list.appendChild(li);
-                });
-            }
+                        list.appendChild(li);
+                    });
+                }
 
-            async function addTask() {
-                const input = document.getElementById('taskInput');
-                if (!input.value) return;
+                async function addTask() {
+                    const input = document.getElementById('taskInput');
+                    if (!input.value) return;
 
-                await fetch('/tasks', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({task: input.value})
-                });
+                    await fetch('/tasks', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({task: input.value})
+                    });
 
-                input.value = '';
+                    input.value = '';
+                    fetchTasks();
+                }
+
+                async function deleteTask(id) {
+                    await fetch('/tasks/' + id, {method: 'DELETE'});
+                    fetchTasks();
+                }
+
+                async function toggleTask(id) {
+                    await fetch('/tasks/' + id + '/toggle', {method: 'PUT'});
+                    fetchTasks();
+                }
+
                 fetchTasks();
-            }
-
-            async function deleteTask(id) {
-                await fetch('/tasks/' + id, {method: 'DELETE'});
-                fetchTasks();
-            }
-
-            async function toggleTask(id) {
-                await fetch('/tasks/' + id + '/toggle', {method: 'PUT'});
-                fetchTasks();
-            }
-
-            fetchTasks();
-        </script>
-    </body>
+            </script>
+        </body>
     </html>
     """
 
