@@ -20,6 +20,19 @@
         name: docker.io
         state: present
 
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Configure Nginx as reverse proxy
+      template:
+        src: "nginx.conf.j2"
+        dest: "/etc/nginx/sites-available/default"
+      notify:
+        - Restart Nginx
+
     - name: Ensure Docker service is running and enabled on boot
       service:
         name: docker
