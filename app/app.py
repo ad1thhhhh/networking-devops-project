@@ -1,7 +1,13 @@
-# Auto deployed test
 from flask import Flask
+import psutil
 
 app = Flask(__name__)
+
+@app.route("/cpu")
+def cpu():
+    return {
+        "cpu_usage_percent": psutil.cpu_percent(interval=1)
+    }
 
 @app.route("/")
 def home():
