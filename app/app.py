@@ -1,7 +1,21 @@
 from flask import Flask
+import os
 import psutil
+import socket
+from datetime import datetime
 
 app = Flask(__name__)
+
+VERSION = os.getenv("VERSION", "dev")
+
+@app.route("/")
+def home():
+    return {
+        "message": "Repoxi DevOps Monitor",
+        "deployment_version": VERSION,
+        "hostname": socket.gethostname(),
+        "timestamp": datetime.utcnow().isoformat()
+    }
 
 @app.route("/cpu")
 def cpu():
@@ -11,51 +25,9 @@ def cpu():
         "memory_usage_percent": psutil.virtual_memory().percent
     }
 
-@app.route("/")
-def home():
-    return """
-    <html>
-        <head>
-            <title>Networking CA01</title>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    background-color: #f4f6f9;
-                    text-align: center;
-                    padding-top: 100px;
-                }
-                .card {
-                    background: white;
-                    padding: 40px;
-                    border-radius: 12px;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                    display: inline-block;
-                }
-                h1 {
-                    color: #2c3e50;
-                }
-                p {
-                    color: #555;
-                    font-size: 18px;
-                }
-                .footer {
-                    margin-top: 20px;
-                    font-size: 14px;
-                    color: #888;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="card">
-                <h1>🚀 Networking Project is Live! CI/CD Working 2 test - Version 2</h1>
-                <p>Automated Continuous Deployment is working successfully.</p>
-                <div class="footer">
-                    Built using Python-Flask
-                </div>
-            </div>
-        </body>
-    </html>
-    """
+@app.route("/health")
+def health():
+    return {"status": "healthy"}, 200
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
