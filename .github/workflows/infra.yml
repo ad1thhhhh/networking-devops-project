@@ -48,6 +48,4 @@ jobs:
         run: echo "VM_IP=$(terraform output -raw vm_public_ip)" >> $GITHUB_ENV
 
       - name: Update GitHub Secret VM_IP
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
-          gh secret set VM_IP --body "$VM_IP"
+        run:  gh secret set VM_IP --body "$VM_IP"
