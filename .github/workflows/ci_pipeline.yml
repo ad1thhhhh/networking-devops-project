@@ -1,4 +1,4 @@
-name: App Deployment Pipeline
+name: App Deployment CI/CD
 
 on:
   push:
