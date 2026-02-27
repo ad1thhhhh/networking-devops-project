@@ -1,7 +1,11 @@
-from flask import Flask, render_template, request, redirect, session, url_for
+from flask import Flask, render_template, request, redirect, session, flash
+import os
 
 app = Flask(__name__)
 app.secret_key = "driftwood_secret_key"
+
+# Environment (DEV by default, can override with ENV_NAME variable)
+app.config["ENV_NAME"] = os.environ.get("ENV_NAME", "DEV")
 
 # Hardcoded users
 users = {
@@ -32,9 +36,11 @@ def login():
         if username in users and users[username]["password"] == password:
             session["username"] = username
             session["role"] = users[username]["role"]
+            flash("Login successful!", "success")
             return redirect("/")
         else:
-            return render_template("login.html", error="Invalid credentials")
+            flash("Invalid credentials", "error")
+            return redirect("/login")
 
     return render_template("login.html")
 
@@ -42,6 +48,7 @@ def login():
 @app.route("/logout")
 def logout():
     session.clear()
+    flash("Logged out successfully", "info")
     return redirect("/login")
 
 
@@ -52,15 +59,26 @@ def curator_dashboard():
 
     if request.method == "POST":
         task_title = request.form["task"]
+
+        # Create task with proper ID
         tasks.append({
+            "id": len(tasks),
             "title": task_title,
             "completed": False
         })
 
+        flash("Task created successfully!", "success")
+        return redirect("/curator")
+
     completed_count = sum(1 for task in tasks if task["completed"])
     progress = (completed_count / len(tasks) * 100) if tasks else 0
 
-    return render_template("curator.html", tasks=tasks, progress=progress)
+    return render_template(
+        "curator.html",
+        tasks=tasks,
+        progress=progress,
+        env_name=app.config["ENV_NAME"]
+    )
 
 
 @app.route("/complete/<int:task_id>")
@@ -68,8 +86,11 @@ def complete_task(task_id):
     if "username" not in session or session["role"] != "artisan":
         return redirect("/login")
 
-    if 0 <= task_id < len(tasks):
-        tasks[task_id]["completed"] = True
+    for task in tasks:
+        if task["id"] == task_id:
+            task["completed"] = True
+            flash("Task marked as complete!", "success")
+            break
 
     return redirect("/artisan")
 
@@ -79,7 +100,11 @@ def artisan_dashboard():
     if "username" not in session or session["role"] != "artisan":
         return redirect("/login")
 
-    return render_template("artisan.html", tasks=tasks)
+    return render_template(
+        "artisan.html",
+        tasks=tasks,
+        env_name=app.config["ENV_NAME"]
+    )
 
 
 if __name__ == "__main__":

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ sidebarOpen: true }">
+<head>
+    <meta charset="UTF-8">
+    <title>Driftwood Café</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Alpine.js (lightweight interactivity) -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: '#c59d5f'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background: radial-gradient(circle at top right, #1a1a1a, #0f0f0f);
+        }
+
+        .glass {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+
+<body class="text-gray-200 min-h-screen">
+
+<div class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="w-64 glass p-6 hidden md:block">
+
+        <h2 class="text-2xl font-bold text-gold mb-10">
+            Driftwood Café
+        </h2>
+
+        <nav class="space-y-6">
+            <a href="/" class="block hover:text-gold transition">Home</a>
+            <a href="#" class="block hover:text-gold transition">Dashboard</a>
+            <a href="/logout" class="block hover:text-red-400 transition">Logout</a>
+        </nav>
+
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-10">
+        {% block content %}{% endblock %}
+    </main>
+
+</div>
+
+</body>
+</html>

@@ -1,25 +1,144 @@
-<!-- test app pipeline -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Driftwood Café ☕</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <div class="card">
-        <h1>🌊 Driftwood Café</h1>
-        <p class="subtitle">Crafting calm. Brewing focus.</p>
+    <meta charset="UTF-8">
+    <title>Driftwood Café</title>
 
-        <div class="stats">
-            <p id="taskStats">0 Tasks</p>
-            <div class="progress-container">
-                <div id="progressBar" class="progress-bar"></div>
-            </div>
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: '#c59d5f'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background: radial-gradient(circle at top right, #1a1a1a, #0f0f0f);
+        }
+
+        .glass {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .fade-up {
+            animation: fadeUp 0.8s ease-out;
+        }
+
+        @keyframes fadeUp {
+            from {opacity: 0; transform: translateY(30px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+
+        .glow {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: #c59d5f;
+            filter: blur(150px);
+            opacity: 0.15;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen text-gray-200 relative overflow-hidden">
+
+    <!-- Glow Background -->
+    <div class="glow top-20 left-20"></div>
+    <div class="glow bottom-20 right-20"></div>
+
+    <!-- Navigation -->
+    <nav class="flex justify-between items-center px-10 py-6 relative z-10">
+        <h1 class="text-2xl font-bold text-gold">Driftwood Café</h1>
+        <a href="/login" 
+           class="px-5 py-2 bg-gold text-black rounded-lg hover:scale-105 active:scale-95 transition duration-200">
+            Login
+        </a>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="flex flex-col items-center justify-center text-center mt-24 px-6 fade-up relative z-10">
+
+        <h2 class="text-5xl font-bold mb-6 leading-tight">
+            Curated Task Management <br>
+            <span class="text-gold">Built with DevOps Precision</span>
+        </h2>
+
+        <p class="text-gray-400 max-w-2xl mb-10">
+            Driftwood Café is a role-based task system powered by Flask, Docker,
+            Terraform, GitHub Actions, and Azure infrastructure.
+        </p>
+
+        <div class="flex gap-6">
+            <a href="/login"
+               class="px-8 py-3 bg-gold text-black font-semibold rounded-xl
+                      hover:scale-105 active:scale-95 transition duration-200 shadow-xl">
+                Enter Dashboard
+            </a>
+
+            <a href="#features"
+               class="px-8 py-3 border border-gray-600 rounded-xl
+                      hover:border-gold hover:text-gold transition duration-200">
+                Learn More
+            </a>
         </div>
 
-        <ul id="taskList"></ul>
-    </div>
+    </section>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <!-- Features Section -->
+    <section id="features" class="mt-32 px-10 relative z-10">
+
+        <h3 class="text-3xl font-bold text-center mb-16">
+            Platform Highlights
+        </h3>
+
+        <div class="grid md:grid-cols-3 gap-8">
+
+            <div class="glass p-8 rounded-2xl hover:scale-105 transition duration-300">
+                <h4 class="text-xl font-semibold text-gold mb-4">
+                    Role-Based Access
+                </h4>
+                <p class="text-gray-400">
+                    Separate dashboards for Curators and Artisans with controlled permissions.
+                </p>
+            </div>
+
+            <div class="glass p-8 rounded-2xl hover:scale-105 transition duration-300">
+                <h4 class="text-xl font-semibold text-gold mb-4">
+                    Cloud-Native Deployment
+                </h4>
+                <p class="text-gray-400">
+                    Infrastructure provisioned with Terraform and deployed to Azure via CI/CD.
+                </p>
+            </div>
+
+            <div class="glass p-8 rounded-2xl hover:scale-105 transition duration-300">
+                <h4 class="text-xl font-semibold text-gold mb-4">
+                    Containerized Architecture
+                </h4>
+                <p class="text-gray-400">
+                    Docker-based application deployment with automated image builds.
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- Footer -->
+    <footer class="mt-32 text-center text-gray-500 text-sm pb-10 relative z-10">
+        © 2026 Driftwood Café · Built by Adithravi · DevOps Portfolio Project
+    </footer>
+
 </body>
 </html>
