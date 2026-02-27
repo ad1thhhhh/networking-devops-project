@@ -1,50 +1,33 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="min-h-[80vh] flex flex-col justify-center items-center text-center space-y-10 animate-fadeIn">
+<div class="flex justify-center items-center min-h-[70vh] fade-in">
+    <div class="glass p-10 rounded-2xl w-96 shadow-2xl">
+        <h2 class="text-3xl font-bold mb-6 text-center">Login</h2>
 
-    <h1 class="text-6xl font-extrabold bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
-        Driftwood
-    </h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="mb-3 text-center text-sm text-red-400">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
 
-    <p class="text-gray-400 text-xl max-w-2xl">
-        A premium productivity command center built for modern digital teams.
-    </p>
+        <form method="POST" class="space-y-4">
+            <input type="text" name="username" placeholder="Username"
+                   class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
 
-    <div class="flex gap-6">
-        <a href="/login"
-           class="px-10 py-5 rounded-2xl bg-gradient-to-r 
-                  from-indigo-600 to-purple-600 
-                  hover:scale-105 active:scale-95 transition font-semibold">
-            Get Started
-        </a>
+            <input type="password" name="password" placeholder="Password"
+                   class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+            <button type="submit"
+                    class="w-full bg-blue-600 py-3 rounded-lg hover:bg-blue-700 transition">
+                Sign In
+            </button>
+        </form>
     </div>
-
-    <div class="grid md:grid-cols-3 gap-8 mt-20">
-
-        <div class="bg-white/5 p-8 rounded-3xl border border-white/10">
-            <h3 class="text-lg font-semibold text-white mb-3">Role-Based Access</h3>
-            <p class="text-gray-400 text-sm">
-                Secure dashboards for curators and artisans.
-            </p>
-        </div>
-
-        <div class="bg-white/5 p-8 rounded-3xl border border-white/10">
-            <h3 class="text-lg font-semibold text-white mb-3">Live Analytics</h3>
-            <p class="text-gray-400 text-sm">
-                Visual progress tracking and KPIs.
-            </p>
-        </div>
-
-        <div class="bg-white/5 p-8 rounded-3xl border border-white/10">
-            <h3 class="text-lg font-semibold text-white mb-3">Premium UX</h3>
-            <p class="text-gray-400 text-sm">
-                Dark SaaS interface with modern interactions.
-            </p>
-        </div>
-
-    </div>
-
 </div>
 
 {% endblock %}
