@@ -1,94 +1,131 @@
 {% extends "base.html" %}
-
 {% block content %}
 
-<div class="space-y-10">
+<div class="space-y-14 animate-fadeIn">
 
-    <!-- Header Section -->
-    <div class="flex justify-between items-center">
-        <div>
-            <h1 class="text-3xl font-bold text-white">Curator Dashboard</h1>
-            <p class="text-gray-400 mt-2">Manage and track all artisan tasks.</p>
-        </div>
+{% set total = tasks|length %}
+{% set completed = tasks|selectattr("completed")|list|length %}
+{% set active = total - completed %}
+
+<div>
+    <h1 class="text-4xl font-bold text-white">Curator Dashboard</h1>
+    <p class="text-gray-400 mt-2">Executive overview of artisan workflow.</p>
+</div>
+
+<!-- KPI CARDS -->
+<div class="grid md:grid-cols-3 gap-8">
+
+    <div class="bg-white/5 p-8 rounded-3xl border border-white/10">
+        <p class="text-gray-400">Total Tasks</p>
+        <h2 class="text-5xl font-bold counter" data-target="{{ total }}">0</h2>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid md:grid-cols-3 gap-6">
-
-        <div class="bg-[#111827] p-6 rounded-2xl border border-gray-800">
-            <p class="text-gray-400 text-sm">Total Tasks</p>
-            <h2 class="text-3xl font-bold text-white mt-2">
-                {{ tasks|length }}
-            </h2>
-        </div>
-
-        <div class="bg-[#111827] p-6 rounded-2xl border border-gray-800">
-            <p class="text-gray-400 text-sm">Completed</p>
-            <h2 class="text-3xl font-bold text-green-400 mt-2">
-                {{ tasks|selectattr("completed")|list|length }}
-            </h2>
-        </div>
-
-        <div class="bg-[#111827] p-6 rounded-2xl border border-gray-800">
-            <p class="text-gray-400 text-sm">Progress</p>
-            <h2 class="text-3xl font-bold text-indigo-400 mt-2">
-                {{ progress|round(0) }}%
-            </h2>
-        </div>
-
+    <div class="bg-white/5 p-8 rounded-3xl border border-white/10">
+        <p class="text-gray-400">Completed</p>
+        <h2 class="text-5xl font-bold counter" data-target="{{ completed }}">0</h2>
     </div>
 
-    <!-- Progress Bar -->
-    <div class="bg-[#111827] p-6 rounded-2xl border border-gray-800">
-        <div class="w-full bg-gray-800 rounded-full h-3">
-            <div class="bg-indigo-500 h-3 rounded-full transition-all duration-500"
-                 style="width: {{ progress }}%">
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Task -->
-    <div class="bg-[#111827] p-6 rounded-2xl border border-gray-800">
-        <form method="POST" class="flex gap-4">
-            <input type="text"
-                   name="task"
-                   placeholder="Enter new task..."
-                   required
-                   class="flex-1 px-4 py-3 rounded-lg bg-gray-900 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-
-            <button type="submit"
-                    class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-lg font-medium transition">
-                Add Task
-            </button>
-        </form>
-    </div>
-
-    <!-- Task List -->
-    <div class="bg-[#111827] p-6 rounded-2xl border border-gray-800 space-y-4">
-        <h2 class="text-lg font-semibold text-white mb-4">All Tasks</h2>
-
-        {% if tasks %}
-            {% for task in tasks %}
-                <div class="flex justify-between items-center px-4 py-3 rounded-lg bg-gray-900 border border-gray-800">
-                    
-                    <span class="{% if task.completed %}line-through text-gray-500{% else %}text-gray-200{% endif %}">
-                        {{ task.title }}
-                    </span>
-
-                    {% if task.completed %}
-                        <span class="text-green-400 text-sm font-medium">Completed</span>
-                    {% else %}
-                        <span class="text-yellow-400 text-sm font-medium">Pending</span>
-                    {% endif %}
-
-                </div>
-            {% endfor %}
-        {% else %}
-            <p class="text-gray-500">No tasks yet.</p>
-        {% endif %}
-
+    <div class="bg-white/5 p-8 rounded-3xl border border-white/10">
+        <p class="text-gray-400">Progress</p>
+        <h2 class="text-5xl font-bold">{{ progress|round(0) }}%</h2>
     </div>
 
 </div>
+
+<!-- CHART -->
+<div class="bg-white/5 p-8 rounded-3xl border border-white/10">
+    <canvas id="taskChart"></canvas>
+</div>
+
+<!-- MODAL BUTTON -->
+<div class="text-right">
+    <button onclick="openModal()" class="px-8 py-4 rounded-2xl bg-indigo-600 hover:scale-105 transition">
+        + New Task
+    </button>
+</div>
+
+<!-- TASK LIST -->
+<div class="space-y-4">
+{% for task in tasks %}
+    <div class="bg-white/5 p-6 rounded-2xl border border-white/10 flex justify-between">
+        <span class="{% if task.completed %}line-through text-gray-500{% endif %}">
+            {{ task.title }}
+        </span>
+        <span class="{% if task.completed %}text-green-400{% else %}text-yellow-400{% endif %}">
+            {% if task.completed %}Completed{% else %}Active{% endif %}
+        </span>
+    </div>
+{% endfor %}
+</div>
+
+</div>
+
+<!-- MODAL -->
+<div id="taskModal" class="fixed inset-0 hidden items-center justify-center bg-black/60">
+    <div class="bg-[#0f172a] p-10 rounded-3xl w-full max-w-md">
+        <form method="POST" class="space-y-6">
+            <input type="text" name="task" required placeholder="Task..."
+                class="w-full px-4 py-3 rounded-xl bg-black/40 border border-gray-700">
+            <div class="flex justify-end gap-4">
+                <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-700 rounded-xl">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-indigo-600 rounded-xl">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    // Counter Animation
+    document.querySelectorAll(".counter").forEach(counter => {
+        const target = +counter.dataset.target;
+        let count = 0;
+        const update = () => {
+            const inc = target / 40;
+            if (count < target) {
+                count += inc;
+                counter.innerText = Math.ceil(count);
+                requestAnimationFrame(update);
+            } else {
+                counter.innerText = target;
+            }
+        };
+        update();
+    });
+
+    // Chart
+    new Chart(document.getElementById("taskChart"), {
+        type: 'doughnut',
+        data: {
+            labels: ['Completed', 'Active'],
+            datasets: [{
+                data: [{{ completed }}, {{ active }}],
+                backgroundColor: ['#22c55e', '#6366f1'],
+                borderWidth: 0
+            }]
+        },
+        options: { cutout: '70%' }
+    });
+
+    // Streak
+    let streak = localStorage.getItem("streak") || 0;
+    if ({{ completed }} > 0) {
+        streak++;
+        localStorage.setItem("streak", streak);
+    }
+
+});
+
+function openModal() {
+    document.getElementById("taskModal").classList.remove("hidden");
+    document.getElementById("taskModal").classList.add("flex");
+}
+
+function closeModal() {
+    document.getElementById("taskModal").classList.add("hidden");
+    document.getElementById("taskModal").classList.remove("flex");
+}
+</script>
 
 {% endblock %}

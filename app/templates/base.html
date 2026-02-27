@@ -1,88 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Driftwood Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base.html" %}
+{% block content %}
 
-    <!-- Tailwind CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+<div class="min-h-[80vh] flex flex-col justify-center items-center text-center space-y-10 animate-fadeIn">
 
-    <!-- Premium Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <h1 class="text-6xl font-extrabold bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
+        Driftwood
+    </h1>
 
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
-</head>
+    <p class="text-gray-400 text-xl max-w-2xl">
+        A premium productivity command center built for modern digital teams.
+    </p>
 
-<body class="bg-[#0f172a] text-gray-200 min-h-screen">
-
-    <!-- Top Navigation -->
-    <nav class="bg-[#0b1220] border-b border-gray-800 px-8 py-4 flex justify-between items-center">
-        
-        <!-- Logo -->
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-indigo-600 rounded-lg"></div>
-            <span class="text-lg font-semibold tracking-wide text-white">
-                Driftwood
-            </span>
-        </div>
-
-        <!-- Right Section -->
-        <div class="flex items-center gap-6">
-
-            <!-- ENV Badge -->
-            {% if env_name == "PROD" %}
-                <span class="px-3 py-1 text-xs font-medium rounded-full bg-red-600 text-white">
-                    PROD
-                </span>
-            {% else %}
-                <span class="px-3 py-1 text-xs font-medium rounded-full bg-green-600 text-white">
-                    DEV
-                </span>
-            {% endif %}
-
-            {% if session.username %}
-                <span class="text-sm text-gray-400">
-                    {{ session.username }}
-                </span>
-
-                <a href="/logout"
-                   class="px-4 py-2 text-sm rounded-lg bg-gray-800 hover:bg-gray-700 transition">
-                    Logout
-                </a>
-            {% endif %}
-        </div>
-    </nav>
-
-    <!-- Flash Messages -->
-    <div class="max-w-6xl mx-auto mt-6 px-6">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="mb-4 px-4 py-3 rounded-lg text-sm
-                        {% if category == 'success' %}
-                            bg-green-900 text-green-300
-                        {% elif category == 'error' %}
-                            bg-red-900 text-red-300
-                        {% else %}
-                            bg-gray-800 text-gray-300
-                        {% endif %}
-                    ">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+    <div class="flex gap-6">
+        <a href="/login"
+           class="px-10 py-5 rounded-2xl bg-gradient-to-r 
+                  from-indigo-600 to-purple-600 
+                  hover:scale-105 active:scale-95 transition font-semibold">
+            Get Started
+        </a>
     </div>
 
-    <!-- Main Content -->
-    <main class="max-w-6xl mx-auto px-6 py-10">
-        {% block content %}{% endblock %}
-    </main>
+    <div class="grid md:grid-cols-3 gap-8 mt-20">
 
-</body>
-</html>
+        <div class="bg-white/5 p-8 rounded-3xl border border-white/10">
+            <h3 class="text-lg font-semibold text-white mb-3">Role-Based Access</h3>
+            <p class="text-gray-400 text-sm">
+                Secure dashboards for curators and artisans.
+            </p>
+        </div>
+
+        <div class="bg-white/5 p-8 rounded-3xl border border-white/10">
+            <h3 class="text-lg font-semibold text-white mb-3">Live Analytics</h3>
+            <p class="text-gray-400 text-sm">
+                Visual progress tracking and KPIs.
+            </p>
+        </div>
+
+        <div class="bg-white/5 p-8 rounded-3xl border border-white/10">
+            <h3 class="text-lg font-semibold text-white mb-3">Premium UX</h3>
+            <p class="text-gray-400 text-sm">
+                Dark SaaS interface with modern interactions.
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
