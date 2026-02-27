@@ -1,5 +1,4 @@
 name: infrastructure pipeline
-
 on:
   push:
     paths:

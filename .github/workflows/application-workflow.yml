@@ -1,10 +1,10 @@
 name: application pipeline
-
 on:
   push:
     paths:
       - 'app/**'
       - 'ansible/**'
+  workflow_dispatch:
 
 permissions:
   contents: read
