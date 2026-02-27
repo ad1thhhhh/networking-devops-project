@@ -2,18 +2,40 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Artisan Platform</title>
+    <title>Artisan OS</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         body {
-            background: radial-gradient(circle at top left, #0f172a, #020617);
+            background:
+                radial-gradient(circle at 20% 20%, rgba(99,102,241,0.15), transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(168,85,247,0.15), transparent 40%),
+                linear-gradient(to bottom, #0f172a, #020617);
         }
 
         .glass {
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            transition: all 0.3s ease;
+        }
+
+        .glass:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 60px rgba(0,0,0,0.5);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            transition: all 0.25s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(99,102,241,0.4);
         }
 
         .fade-in {
@@ -24,22 +46,45 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        .pulse-glow {
+            animation: pulseGlow 2.5s infinite ease-in-out;
+        }
+
+        @keyframes pulseGlow {
+            0%,100% { box-shadow: 0 0 0px rgba(168,85,247,0.4); }
+            50% { box-shadow: 0 0 25px rgba(168,85,247,0.6); }
+        }
     </style>
 </head>
 
-<body class="text-white min-h-screen">
+<body class="text-white min-h-screen relative overflow-x-hidden">
 
-<nav class="flex justify-between items-center p-6 glass">
-    <h1 class="text-xl font-bold">Artisan OS</h1>
-    <div class="space-x-4 text-sm text-gray-300">
-        <span>{{ env_name }}</span>
-        <a href="/logout" class="hover:text-white">Logout</a>
+    <!-- Floating Gradient Orbs -->
+    <div class="fixed -top-40 -left-40 w-96 h-96 bg-indigo-600 opacity-20 blur-3xl rounded-full animate-pulse"></div>
+    <div class="fixed -bottom-40 -right-40 w-96 h-96 bg-purple-600 opacity-20 blur-3xl rounded-full animate-pulse"></div>
+
+    <!-- Navbar -->
+    <nav class="flex justify-between items-center px-8 py-5 glass sticky top-0 z-50">
+        <h1 class="text-xl font-semibold tracking-wide">
+            Artisan<span class="text-indigo-400">OS</span>
+        </h1>
+
+        <div class="flex items-center gap-6 text-sm text-gray-300">
+            <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10">
+                {{ env_name }}
+            </span>
+
+            <a href="/logout"
+               class="hover:text-white transition hover:scale-105">
+                Logout
+            </a>
+        </div>
+    </nav>
+
+    <div class="p-10 relative z-10">
+        {% block content %}{% endblock %}
     </div>
-</nav>
-
-<div class="p-10">
-    {% block content %}{% endblock %}
-</div>
 
 </body>
 </html>

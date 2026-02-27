@@ -3,18 +3,39 @@
 
 <h1 class="text-4xl font-bold mb-8 fade-in">Artisan Dashboard</h1>
 
-<div class="space-y-4">
+<div class="glass p-4 rounded-xl mb-8 flex justify-between items-center">
+    <div>
+        <div class="text-gray-400 text-sm">Daily Streak</div>
+        <div id="streakCount" class="text-3xl font-bold">0</div>
+    </div>
+    <div class="text-4xl">🔥</div>
+</div>
+
+<div class="space-y-5">
 {% for task in tasks %}
-    <div class="glass p-4 rounded-xl flex justify-between items-center">
-        <span>{{ task.title }}</span>
+    <div class="glass p-5 rounded-2xl flex justify-between items-center">
+
+        <div>
+            <div class="font-medium text-lg">
+                {{ task.title }}
+            </div>
+
+            {% if task.completed %}
+            <div class="text-green-400 text-sm mt-1">
+                ✔ Completed
+            </div>
+            {% endif %}
+        </div>
 
         {% if not task.completed %}
         <a href="/complete/{{ task.id }}"
-           class="bg-green-600 px-4 py-2 rounded-lg hover:bg-green-700 transition">
+           class="btn-primary px-5 py-2 rounded-xl text-sm font-semibold">
             Complete
         </a>
         {% else %}
-        <span class="text-green-400 font-bold">Completed</span>
+        <div class="px-4 py-2 rounded-xl bg-green-500/20 text-green-400 text-sm pulse-glow">
+            Done
+        </div>
         {% endif %}
     </div>
 {% endfor %}
@@ -22,9 +43,14 @@
 
 <script>
 let streak = localStorage.getItem("streak") || 0;
-if (streak) {
-    console.log("Current streak:", streak);
-}
+document.getElementById("streakCount").innerText = streak;
+
+document.querySelectorAll("a[href*='/complete/']").forEach(btn => {
+    btn.addEventListener("click", () => {
+        streak++;
+        localStorage.setItem("streak", streak);
+    });
+});
 </script>
 
 {% endblock %}
