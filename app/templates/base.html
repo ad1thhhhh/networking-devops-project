@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Driftwood Café OS</title>
+<title>Driftwood Café</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -25,195 +25,135 @@ tailwind.config = {
 </script>
 
 <style>
-html { scroll-behavior: smooth; }
 
+/* Background Ambience */
 body {
     background:
         radial-gradient(circle at 20% 20%, rgba(192,138,77,0.08), transparent 40%),
         radial-gradient(circle at 80% 80%, rgba(255,248,239,0.05), transparent 40%),
         #2a1f1a;
-    color: #f5e6d3;
-    overflow-x: hidden;
-    transition: background 0.4s ease, color 0.4s ease;
+    color:#f5e6d3;
+    min-height:100vh;
+    overflow-x:hidden;
 }
 
-/* LIGHT MODE */
-.light-mode {
-    background:#f5e6d3 !important;
-    color:#2a1f1a !important;
-}
-
-.light-mode nav {
-    background:#fff8ef !important;
-    color:#2a1f1a !important;
-}
-
-.light-mode .card {
-    background:#fff8ef !important;
-    color:#2a1f1a !important;
-}
-
-/* Loader */
-#pageLoader {
-    transition: opacity 0.7s ease;
-}
-
-/* Steam */
+/* Floating Steam Animation */
 .steam {
-    position:absolute;
+    position:fixed;
     width:8px;
     height:60px;
     background:rgba(255,248,239,0.08);
     border-radius:50%;
     filter:blur(6px);
-    animation:steamRise 4s infinite ease-in-out;
-}
-@keyframes steamRise {
-    0%{transform:translateY(0) scaleX(1);opacity:0;}
-    30%{opacity:1;}
-    50%{transform:translateY(-40px) scaleX(1.2);}
-    100%{transform:translateY(-80px) scaleX(0.8);opacity:0;}
+    animation:steamRise 6s infinite ease-in-out;
+    pointer-events:none;
 }
 
-/* Cards */
-.card {
-    background:#3b2b23;
-    border-radius:20px;
-    box-shadow:0 15px 40px rgba(0,0,0,0.5);
-    transition:all 0.3s cubic-bezier(.25,.8,.25,1);
+@keyframes steamRise {
+    0% {transform:translateY(0) scaleX(1); opacity:0;}
+    30% {opacity:1;}
+    60% {transform:translateY(-60px) scaleX(1.2);}
+    100% {transform:translateY(-120px) scaleX(0.8); opacity:0;}
 }
+
+/* Card */
+.card {
+    background:rgba(59,43,35,0.95);
+    backdrop-filter:blur(6px);
+    border-radius:22px;
+    box-shadow:0 20px 40px rgba(0,0,0,0.6);
+    transition:all 0.3s ease;
+}
+
 .card:hover {
     transform:translateY(-6px);
     box-shadow:0 25px 50px rgba(0,0,0,0.7);
 }
 
-/* Buttons */
-button, a {
-    transition: all 0.2s ease;
-}
-
-button:hover {
-    transform: translateY(-2px);
-}
-
-button:active {
-    transform: scale(0.97);
-}
-
+/* Button */
 .btn-coffee {
     background:linear-gradient(135deg,#c08a4d,#a06f3d);
     color:#2a1f1a;
-    font-weight:600;
+    padding:10px 20px;
     border-radius:14px;
+    font-weight:600;
+    transition:all 0.25s ease;
 }
 
-/* Fade */
+.btn-coffee:hover {
+    transform:translateY(-3px) scale(1.05);
+    box-shadow:0 10px 25px rgba(192,138,77,0.4);
+}
+
+.btn-coffee:active {
+    transform:scale(0.96);
+}
+
+/* Inputs */
+.input-coffee {
+    background:#3b2b23;
+    border:1px solid rgba(255,255,255,0.1);
+    padding:12px 16px;
+    border-radius:14px;
+    width:100%;
+    color:#f5e6d3;
+    transition:all 0.25s ease;
+}
+
+.input-coffee:focus {
+    outline:none;
+    border-color:#c08a4d;
+    box-shadow:0 0 12px rgba(192,138,77,0.3);
+}
+
+/* Page Fade In */
 .fade-in {
     animation:fadeIn 0.8s ease forwards;
 }
+
 @keyframes fadeIn {
-    from{opacity:0;transform:translateY(15px);}
-    to{opacity:1;transform:translateY(0);}
+    from {opacity:0; transform:translateY(30px);}
+    to {opacity:1; transform:translateY(0);}
 }
+
+/* Soft Pulse for important numbers */
+.pulse-soft {
+    animation:pulseSoft 2.5s infinite ease-in-out;
+}
+
+@keyframes pulseSoft {
+    0% {transform:scale(1);}
+    50% {transform:scale(1.05);}
+    100% {transform:scale(1);}
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width:8px;
+}
+::-webkit-scrollbar-track {
+    background:#2a1f1a;
+}
+::-webkit-scrollbar-thumb {
+    background:#c08a4d;
+    border-radius:10px;
+}
+
 </style>
+
 </head>
 
-<body class="min-h-screen relative">
+<body class="p-8 relative">
 
-<!-- Loader -->
-<div id="pageLoader"
-     class="fixed inset-0 bg-espresso flex items-center justify-center z-50">
-    <div class="text-caramel text-2xl animate-pulse">☕ Brewing...</div>
-</div>
+<!-- Ambient Steam -->
+<div class="steam left-1/4 top-20"></div>
+<div class="steam left-1/2 top-32" style="animation-delay:2s;"></div>
+<div class="steam left-3/4 top-28" style="animation-delay:4s;"></div>
 
-<!-- Steam -->
-<div class="steam left-1/3 top-20"></div>
-<div class="steam left-1/2 top-32" style="animation-delay:1s;"></div>
-<div class="steam left-2/3 top-24" style="animation-delay:2s;"></div>
-
-<!-- Navbar -->
-<nav class="flex justify-between items-center px-6 md:px-10 py-6 bg-roast shadow-lg sticky top-0 z-40">
-    <div class="text-2xl font-bold tracking-wide text-caramel">
-        Driftwood Café
-    </div>
-
-    <div class="flex items-center gap-4 text-sm text-cream">
-        <button onclick="toggleTheme()"
-            class="border border-caramel px-4 py-1 rounded-xl hover:bg-caramel hover:text-espresso transition">
-            Toggle Roast
-        </button>
-        <span class="opacity-70 hidden md:block">{{ env_name }}</span>
-        <a href="/logout" class="hover:text-caramel">Logout</a>
-    </div>
-</nav>
-
-<main class="p-6 md:p-12 fade-in relative z-10">
-
-<div id="welcomeBanner"
-     class="mb-6 px-6 py-3 rounded-xl bg-caramel text-espresso font-semibold opacity-0 translate-y-4 transition-all duration-700">
-    Welcome back, {{ session.get('username') }} ☕
-</div>
-
+<div class="max-w-7xl mx-auto fade-in">
 {% block content %}{% endblock %}
-</main>
-
-<script>
-
-/* Loader fade */
-window.addEventListener("load",()=>{
-    const loader=document.getElementById("pageLoader");
-    loader.style.opacity="0";
-    setTimeout(()=>loader.style.display="none",700);
-
-    const banner=document.getElementById("welcomeBanner");
-    setTimeout(()=>{
-        banner.classList.remove("opacity-0","translate-y-4");
-    },500);
-    setTimeout(()=>{
-        banner.classList.add("opacity-0","translate-y-4");
-    },3500);
-});
-
-/* Theme */
-function toggleTheme(){
-    document.body.classList.toggle("light-mode");
-    localStorage.setItem("theme",
-        document.body.classList.contains("light-mode")?"light":"dark");
-}
-if(localStorage.getItem("theme")==="light"){
-    document.body.classList.add("light-mode");
-}
-
-/* Page transitions */
-document.querySelectorAll("a[href]").forEach(link=>{
-    link.addEventListener("click",function(e){
-        const href=this.getAttribute("href");
-        if(href.startsWith("/")&&!href.includes("#")){
-            e.preventDefault();
-            const loader=document.getElementById("pageLoader");
-            loader.style.display="flex";
-            loader.style.opacity="1";
-            setTimeout(()=>{window.location=href;},300);
-        }
-    });
-});
-
-/* Cursor glow */
-const cursor=document.createElement("div");
-cursor.style.position="fixed";
-cursor.style.width="12px";
-cursor.style.height="12px";
-cursor.style.borderRadius="50%";
-cursor.style.background="rgba(192,138,77,0.3)";
-cursor.style.pointerEvents="none";
-cursor.style.zIndex="9999";
-document.body.appendChild(cursor);
-document.addEventListener("mousemove",e=>{
-    cursor.style.left=e.clientX+"px";
-    cursor.style.top=e.clientY+"px";
-});
-
-</script>
+</div>
 
 </body>
-</html>
+</html>xy
+

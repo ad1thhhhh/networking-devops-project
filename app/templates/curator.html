@@ -1,187 +1,195 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="max-w-7xl mx-auto">
+<div class="max-w-6xl mx-auto space-y-12">
 
-    <!-- Header -->
-    <div class="mb-10">
-        <h1 class="text-4xl font-bold text-caramel">
-            Curator Console
-        </h1>
-        <p class="text-cream opacity-70 mt-2">
-            Manager Analytics & Café Insights
-        </p>
-    </div>
+<h1 class="text-4xl font-bold text-caramel tracking-wide">
+Curator Task Console
+</h1>
 
-    <!-- KPI Cards -->
-    <div id="kpiSection"
-         class="grid sm:grid-cols-2 xl:grid-cols-3 gap-8 mb-12 transition-opacity duration-400">
+<!-- Add Task -->
+<div class="card p-8 space-y-6">
 
-        <div class="card p-6 text-center">
-            <div class="text-sm opacity-60">Total Orders</div>
-            <div id="totalOrders"
-                 class="text-3xl font-bold text-caramel mt-2">
-                0
-            </div>
-        </div>
+    <h2 class="text-xl font-semibold text-caramel">
+        Create Café Task
+    </h2>
 
-        <div class="card p-6 text-center">
-            <div class="text-sm opacity-60">Completed</div>
-            <div id="completedOrders"
-                 class="text-3xl font-bold text-green-400 mt-2">
-                0
-            </div>
-        </div>
+    <div class="grid md:grid-cols-3 gap-6">
 
-        <div class="card p-6 text-center">
-            <div class="text-sm opacity-60">Pending / In Progress</div>
-            <div id="pendingOrders"
-                 class="text-3xl font-bold text-yellow-400 mt-2">
-                0
-            </div>
-        </div>
+        <input type="text"
+               id="task_name"
+               placeholder="e.g. Clean Coffee Machine"
+               class="input-coffee">
 
-    </div>
+        <select id="priority"
+                class="input-coffee">
+            <option value="normal">Normal Priority</option>
+            <option value="high">High Priority</option>
+        </select>
 
-    <!-- Charts -->
-    <div id="chartSection"
-         class="grid lg:grid-cols-2 gap-10 transition-opacity duration-400">
-
-        <div class="card p-8">
-            <h2 class="text-lg font-semibold text-caramel mb-6">
-                Weekly Revenue Trend
-            </h2>
-            <canvas id="revenueChart"></canvas>
-        </div>
-
-        <div class="card p-8">
-            <h2 class="text-lg font-semibold text-caramel mb-6">
-                Order Distribution
-            </h2>
-            <canvas id="statusChart"></canvas>
-        </div>
+        <button onclick="addTask()"
+                class="btn-coffee">
+            Add Task
+        </button>
 
     </div>
 
 </div>
 
+<!-- KPI Section -->
+<div class="grid md:grid-cols-3 gap-8">
+
+    <div class="card p-6 text-center">
+        <div class="opacity-60">Total Tasks</div>
+        <div id="totalTasks"
+             class="text-4xl text-caramel font-bold transition-all duration-300">
+            0
+        </div>
+    </div>
+
+    <div class="card p-6 text-center">
+        <div class="opacity-60">Completed</div>
+        <div id="completedTasks"
+             class="text-4xl text-green-400 font-bold transition-all duration-300">
+            0
+        </div>
+    </div>
+
+    <div class="card p-6 text-center">
+        <div class="opacity-60">Pending</div>
+        <div id="pendingTasks"
+             class="text-4xl text-yellow-400 font-bold transition-all duration-300">
+            0
+        </div>
+    </div>
+
+</div>
+
+<!-- Chart -->
+<div class="card p-8">
+    <canvas id="taskChart"></canvas>
+</div>
+
+</div>
+
+<!-- Toast -->
+<div id="toast"
+     class="fixed bottom-8 right-8 bg-caramel text-espresso px-6 py-3 rounded-xl shadow-xl opacity-0 transition-all duration-300">
+Task Added ☕
+</div>
+
 <script>
 
-let revenueChart;
-let statusChart;
-
-/* Animate Counter */
-function animateValue(id, end) {
-    let start = 0;
-    let duration = 1000;
-    let range = end - start;
-    let increment = end > start ? 1 : -1;
-    let stepTime = Math.abs(Math.floor(duration / (range || 1)));
-    let obj = document.getElementById(id);
-
-    let timer = setInterval(function() {
-        start += increment;
-        obj.textContent = start;
-        if (start == end) clearInterval(timer);
-    }, stepTime);
+/* Storage */
+function getTasks(){
+    return JSON.parse(localStorage.getItem("cafeTasks") || "[]");
 }
 
-/* Initialize Dashboard */
-function initDashboard(data){
+function saveTasks(tasks){
+    localStorage.setItem("cafeTasks", JSON.stringify(tasks));
+}
 
-    animateValue("totalOrders", data.total_orders);
-    animateValue("completedOrders", data.completed_orders);
-    animateValue("pendingOrders", data.pending_orders);
+/* Toast */
+function showToast(){
+    const t=document.getElementById("toast");
+    t.style.opacity="1";
+    t.style.transform="translateY(-10px)";
+    setTimeout(()=>{
+        t.style.opacity="0";
+        t.style.transform="translateY(0)";
+    },2000);
+}
 
-    if(revenueChart) revenueChart.destroy();
-    if(statusChart) statusChart.destroy();
+/* Counter Animation */
+function animateNumber(id,end){
+    const el=document.getElementById(id);
+    const start=parseInt(el.textContent)||0;
+    const duration=600;
+    const range=end-start;
+    const increment=range/30;
+    let current=start;
+    let step=0;
 
-    revenueChart = new Chart(document.getElementById('revenueChart'), {
-        type: 'line',
-        data: {
-            labels: data.revenue_labels,
-            datasets: [{
-                label: 'Revenue ($)',
-                data: data.revenue_data,
-                borderColor: '#c08a4d',
-                backgroundColor: 'rgba(192,138,77,0.15)',
-                tension: 0.4,
-                fill: true,
-                pointRadius: 4
+    const timer=setInterval(()=>{
+        current+=increment;
+        el.textContent=Math.round(current);
+        step++;
+        if(step>=30){
+            el.textContent=end;
+            clearInterval(timer);
+        }
+    },duration/30);
+}
+
+/* Add Task */
+function addTask(){
+
+    const name=document.getElementById("task_name").value.trim();
+    const priority=document.getElementById("priority").value;
+
+    if(!name) return;
+
+    const tasks=getTasks();
+
+    tasks.push({
+        id:Date.now(),
+        name:name,
+        priority:priority,
+        status:"pending"
+    });
+
+    saveTasks(tasks);
+
+    document.getElementById("task_name").value="";
+    showToast();
+    renderDashboard();
+}
+
+/* Chart */
+let taskChart;
+
+function renderDashboard(){
+
+    const tasks=getTasks();
+
+    const total=tasks.length;
+    const completed=tasks.filter(t=>t.status==="completed").length;
+    const pending=total-completed;
+
+    animateNumber("totalTasks",total);
+    animateNumber("completedTasks",completed);
+    animateNumber("pendingTasks",pending);
+
+    if(taskChart) taskChart.destroy();
+
+    taskChart=new Chart(document.getElementById("taskChart"),{
+        type:"doughnut",
+        data:{
+            labels:["Completed","Pending"],
+            datasets:[{
+                data:[completed,pending],
+                backgroundColor:["#22c55e","#facc15"],
+                hoverOffset:10
             }]
         },
-        options: {
-            responsive: true,
-            animation: { duration: 1200 },
-            plugins: {
-                legend: { labels: { color: '#f5e6d3' } }
+        options:{
+            animation:{
+                animateScale:true,
+                duration:1000,
+                easing:"easeOutQuart"
             },
-            scales: {
-                x: { ticks: { color: '#f5e6d3' } },
-                y: { ticks: { color: '#f5e6d3' } }
-            }
-        }
-    });
-
-    statusChart = new Chart(document.getElementById('statusChart'), {
-        type: 'doughnut',
-        data: {
-            labels: ['Completed', 'Pending / In Progress'],
-            datasets: [{
-                data: [data.completed_orders, data.pending_orders],
-                backgroundColor: ['#22c55e','#facc15']
-            }]
-        },
-        options: {
-            responsive: true,
-            animation: { duration: 1200 },
-            plugins: {
-                legend: { labels: { color: '#f5e6d3' } }
+            plugins:{
+                legend:{
+                    labels:{color:"#f5e6d3"}
+                }
             }
         }
     });
 }
 
-/* Initial Load */
-initDashboard({
-    total_orders: {{ total_orders }},
-    completed_orders: {{ completed_orders }},
-    pending_orders: {{ pending_orders }},
-    revenue_labels: {{ revenue_labels | safe }},
-    revenue_data: {{ revenue_data | safe }}
-});
-
-/* Auto Refresh Every 30s */
-setInterval(()=>{
-
-    const kpi = document.getElementById("kpiSection");
-    const charts = document.getElementById("chartSection");
-
-    kpi.style.opacity = "0.4";
-    charts.style.opacity = "0.4";
-
-    fetch(window.location.href)
-        .then(res=>res.text())
-        .then(html=>{
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html,"text/html");
-
-            const scriptData = {
-                total_orders: {{ total_orders }},
-                completed_orders: {{ completed_orders }},
-                pending_orders: {{ pending_orders }},
-                revenue_labels: {{ revenue_labels | safe }},
-                revenue_data: {{ revenue_data | safe }}
-            };
-
-            setTimeout(()=>{
-                initDashboard(scriptData);
-                kpi.style.opacity = "1";
-                charts.style.opacity = "1";
-            },400);
-        });
-
-},30000);
+/* Live Sync */
+window.addEventListener("storage",renderDashboard);
+document.addEventListener("DOMContentLoaded",renderDashboard);
 
 </script>
 
