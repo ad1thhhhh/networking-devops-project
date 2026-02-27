@@ -15,8 +15,6 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
 
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: Checkout Code
@@ -48,4 +46,6 @@ jobs:
         run: echo "VM_IP=$(terraform output -raw vm_public_ip)" >> $GITHUB_ENV
 
       - name: Update GitHub Secret VM_IP
-        run:  gh secret set VM_IP --body "$VM_IP"
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: gh secret set VM_IP --body "$VM_IP"
