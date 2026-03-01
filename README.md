@@ -19,7 +19,7 @@ This separation ensures production-level release safety, lifecycle control, and 
 
 ---
 
-# 🏗 High-Level Architecture
+#  High-Level Architecture
 
 The architecture follows **immutable infrastructure principles**:
 
@@ -65,7 +65,7 @@ terraform destroy
 
 ---
 
-# 🔁 CI/CD Pipeline Architecture
+#  CI/CD Pipeline Architecture
 
 The system is designed with **clear separation of concerns**:
 
@@ -76,14 +76,14 @@ The system is designed with **clear separation of concerns**:
 
 ---
 
-# 1️⃣ Infrastructure Pipeline
+#  1. Infrastructure Pipeline
 
-## 🔁 Trigger
+##  i) Trigger
 
 - Triggered on changes in `/terraform` directory
 - Push to `main` branch
 
-## ⚙️ Workflow Responsibilities
+##  ii) Workflow Responsibilities
 
 - Checkout repository
 - Authenticate to Azure using Service Principal
@@ -95,7 +95,7 @@ The system is designed with **clear separation of concerns**:
 - Update GitHub repository secret (`VM_IP`) dynamically
 - Enable cross-pipeline communication securely
 
-## 🔄 Infrastructure Workflow Diagram
+##  iii) Infrastructure Workflow Diagram
 
 ```
         Developer Push (Terraform Code)
@@ -128,7 +128,7 @@ The system is designed with **clear separation of concerns**:
            Infrastructure Ready
 ```
 
-## 💡 Key Engineering Capabilities
+##  iv) Key Engineering Capabilities
 
 - Idempotent infrastructure provisioning
 - Secure Azure authentication via `azure/login@v2`
@@ -139,16 +139,16 @@ The system is designed with **clear separation of concerns**:
 
 ---
 
-# 2️⃣ Application Deployment Pipeline
+#  2. Application Deployment Pipeline
 
-## 🔁 Trigger
+##  i) Trigger
 
 - Push to:
   - `/app/**`
   - `/ansible/**`
 - Manual trigger via `workflow_dispatch`
 
-## ⚙️ Workflow Responsibilities
+##  ii) Workflow Responsibilities
 
 - Checkout application code
 - Authenticate to DockerHub
@@ -162,7 +162,7 @@ The system is designed with **clear separation of concerns**:
 - Deploy new container
 - Expose application on port `80 → 5000`
 
-## 🔄 Application Workflow Diagram
+##  iii) Application Workflow Diagram
 
 ```
         Developer Push (App Code)
@@ -196,7 +196,7 @@ The system is designed with **clear separation of concerns**:
              Application Live
 ```
 
-## 📦 Deployment Strategy
+##  iv) Deployment Strategy
 
 - Immutable container replacement
 - Version-controlled image tagging
@@ -206,7 +206,7 @@ The system is designed with **clear separation of concerns**:
 
 ---
 
-# ⚙️ Technology Stack
+#  Technology Stack
 
 - **Cloud Provider:** Microsoft Azure  
 - **Infrastructure as Code:** Terraform  
@@ -218,7 +218,7 @@ The system is designed with **clear separation of concerns**:
 
 ---
 
-# 🔐 Security & Best Practices
+#  Security & Best Practices
 
 - No credentials stored in source code
 - Azure authentication via Service Principal
@@ -230,7 +230,7 @@ The system is designed with **clear separation of concerns**:
 
 ---
 
-# 📊 Engineering Highlights
+#  Engineering Highlights
 
 - Designed modular Terraform-based Azure infrastructure
 - Implemented dual-pipeline CI/CD architecture
@@ -243,7 +243,7 @@ The system is designed with **clear separation of concerns**:
 
 ---
 
-# 🎯 Objective
+#  Objective
 
 This project demonstrates practical DevOps engineering capabilities by integrating:
 
@@ -257,7 +257,7 @@ This project demonstrates practical DevOps engineering capabilities by integrati
 
 ---
 
-# 🧠 DevOps Principles Demonstrated
+#  DevOps Principles Demonstrated
 
 - Infrastructure as Code (IaC)
 - Continuous Integration
@@ -289,7 +289,7 @@ This project demonstrates practical DevOps engineering capabilities by integrati
 
 ---
 
-# 🚀 Deployment Commands
+#  Deployment Commands
 
 ## Infrastructure
 
@@ -306,10 +306,9 @@ terraform destroy
 
 ---
 
-# 👤 Author
+#  Author
 
 **Adith Ravi**  
-Student Msc.Cybersecurity
-Dublin Business School, Dublin  
+Student (Msc.Cybersecurity) - Dublin Business School, Dublin  
 
 GitHub: https://github.com/ad1thhhhh
