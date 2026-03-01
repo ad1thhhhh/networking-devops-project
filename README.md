@@ -1,48 +1,34 @@
 # ☕ Barista Task List App – Full Cloud Automation on Azure
 
-## Overview
+## 🚀 Enterprise-Grade DevOps Automation Project
 
-This project demonstrates a **fully automated cloud framework** for deploying the Barsita Task List App to **Microsoft Azure** using:
+This project demonstrates a **production-style DevOps architecture** for deploying the **Barista Task List App** to **Microsoft Azure** using:
 
 - Infrastructure as Code (**Terraform**)
 - Containerization (**Docker**)
 - CI/CD Automation (**GitHub Actions**)
 - Configuration Management (**Ansible**)
+- Immutable Infrastructure Principles
 
 The system uses **two independent CI/CD pipelines**:
+
 1. **Infrastructure Pipeline** – Provisions and manages Azure infrastructure  
 2. **Application Deployment Pipeline** – Builds and deploys the containerized application  
-This separation ensures safer releases, better lifecycle control, and production-style deployment architecture.
+
+This separation ensures production-level release safety, lifecycle control, and reduced operational risk.
 
 ---
 
-## 🏗 Architecture Overview
+# 🏗 High-Level Architecture
 
-### Infrastructure Workflow
+The architecture follows **immutable infrastructure principles**:
 
-1. Triggered on push to main and when changes are detected in ./terraform directory
-2. Uses actions/checkout@v3 to pull the latest code
-3. Uses azure/login@v2 to authenticate Azure credentials
-4. Installs Terraform dynamically in GitHub runner
-5. Initializes backend & downloads provider plugins
-6. Provisions or updates Azure infrastructure
-7. Captures dynamic infrastructure output (VM public IP)
-8. Github secrets are updated with VM public IP for Application Deployment pipeline
+- Infrastructure is defined declaratively
+- No manual server configuration
+- Containers are replaced, not modified
+- Infrastructure and application lifecycles are decoupled
 
-
-### Application Workflow
-
-1. Triggered manually or when changes detected in .app/** .ansible/** directory
-2. Uses actions/checkout@v3 to pull latest application code into GitHub runner
-3. Logs into DockerHub using credentials in GitHub secrets
-4. Builds container image from /app directory
-5. Pushes versioned image to DockerHub
-6. Stops and Removes Old Container
-7. Runs new container (Port 80 -> 5000)
-8. Application Live
-
-This architecture enforces **immutable infrastructure** — infrastructure changes are applied declaratively, and application updates are delivered via container replacement rather than manual server modificatio
-
+---
 
 # ☁️ Cloud Infrastructure – Microsoft Azure
 
@@ -50,82 +36,174 @@ All infrastructure is provisioned using Terraform.
 
 ## Provisioned Resources
 
-- Azure Resource Group
-- Virtual Network (VNet)
-- Subnet
-- Network Security Group
-- Public IP Address
-- Linux Virtual Machine
-- Cloud-init bootstrap configuration
+- Azure Resource Group  
+- Virtual Network (VNet)  
+- Subnet  
+- Network Security Group  
+- Public IP Address  
+- Linux Virtual Machine  
+- Cloud-init bootstrap configuration  
 
 ## VM Bootstrapping
 
-During provisioning:
+During provisioning, the VM:
 
-- Docker Engine is installed automatically
-- Required dependencies are configured
-- VM is prepared to run containerized workloads
-- Application container runs on port `80 → 5000`
+- Installs Docker Engine automatically
+- Configures required dependencies
+- Prepares runtime environment
+- Runs containerized application on port:
 
----
-
-# 🔁 CI/CD Pipeline Architecture
-
-## 1️⃣ Infrastructure Pipeline
-
-Triggered when:
-- Changes occur in `/terraform` directory
-
-Performs:
-
-```yaml
-1. Checkout repository
-2. Authenticate to Azure (Service Principal)
-3. Terraform init
-4. Terraform validate
-5. Terraform plan
-6. Terraform apply
+```
+80 → 5000
 ```
 
-### Purpose
-
-- Fully automated Azure resource provisioning
-- Idempotent infrastructure updates
-- Version-controlled infrastructure lifecycle
-- Controlled environment creation & destruction
-
-Infrastructure can also be destroyed using:
+Infrastructure is fully manageable using:
 
 ```bash
+terraform apply
 terraform destroy
 ```
 
 ---
 
-## 2️⃣ Application Deployment Pipeline
+# 🔁 CI/CD Pipeline Architecture
 
-Triggered when:
-- Changes occur in `/app` directory
-- Code is pushed to `main`
+The system is designed with **clear separation of concerns**:
 
-Performs:
+| Pipeline | Responsibility |
+|-----------|----------------|
+| Infrastructure Pipeline | Provision & manage Azure resources |
+| Application Pipeline | Build & deploy containerized app |
 
-```yaml
-1. Checkout repository
-2. Build Docker image
-3. Tag image with commit SHA
-4. Push image to Docker Hub
-5. SSH into VM (or use automation)
-6. Pull latest image
-7. Restart container
+---
+
+# 1️⃣ Infrastructure Pipeline
+
+## 🔁 Trigger
+
+- Triggered on changes in `/terraform` directory
+- Push to `main` branch
+
+## ⚙️ Workflow Responsibilities
+
+- Checkout repository
+- Authenticate to Azure using Service Principal
+- Setup Terraform dynamically
+- Run `terraform init`
+- Run `terraform plan`
+- Run `terraform apply -auto-approve`
+- Extract VM public IP using `terraform output`
+- Update GitHub repository secret (`VM_IP`) dynamically
+- Enable cross-pipeline communication securely
+
+## 🔄 Infrastructure Workflow Diagram
+
+```
+        Developer Push (Terraform Code)
+                     │
+                     ▼
+           GitHub Actions Triggered
+                     │
+                     ▼
+              Azure Login
+                     │
+                     ▼
+              Setup Terraform
+                     │
+                     ▼
+              terraform init
+                     │
+                     ▼
+              terraform plan
+                     │
+                     ▼
+              terraform apply
+                     │
+                     ▼
+         Extract VM Public IP Output
+                     │
+                     ▼
+        Update GitHub Secret (VM_IP)
+                     │
+                     ▼
+           Infrastructure Ready
 ```
 
-### Purpose
+## 💡 Key Engineering Capabilities
 
-- Isolated application release cycle
-- Zero manual server updates
-- Stateless container replacement
-- Safe and repeatable deployments
+- Idempotent infrastructure provisioning
+- Secure Azure authentication via `azure/login@v2`
+- Dynamic Terraform environment setup
+- Runtime extraction of infrastructure outputs
+- Automated secret propagation using GitHub CLI
+- Zero manual cloud configuration
+
+---
+
+# 2️⃣ Application Deployment Pipeline
+
+## 🔁 Trigger
+
+- Push to:
+  - `/app/**`
+  - `/ansible/**`
+- Manual trigger via `workflow_dispatch`
+
+## ⚙️ Workflow Responsibilities
+
+- Checkout application code
+- Authenticate to DockerHub
+- Build Docker image from `/app`
+- Tag image using commit SHA
+- Push image to DockerHub
+- SSH into Azure VM
+- Pull latest container image
+- Stop existing container (if running)
+- Remove old container instance
+- Deploy new container
+- Expose application on port `80 → 5000`
+
+## 🔄 Application Workflow Diagram
+
+```
+        Developer Push (App Code)
+                     │
+                     ▼
+           GitHub Actions Triggered
+                     │
+                     ▼
+              DockerHub Login
+                     │
+                     ▼
+              Build Docker Image
+           (Tagged with Commit SHA)
+                     │
+                     ▼
+              Push to DockerHub
+                     │
+                     ▼
+              SSH into Azure VM
+                     │
+                     ▼
+              Pull Latest Image
+                     │
+                     ▼
+        Stop & Remove Old Container
+                     │
+                     ▼
+              Run New Container
+                     │
+                     ▼
+             Application Live
+```
+
+## 📦 Deployment Strategy
+
+- Immutable container replacement
+- Version-controlled image tagging
+- Stateless deployments
+- Secure SSH-based remote execution
+- Fully automated release process
 
 ---
 
@@ -137,66 +215,47 @@ Performs:
 - **Containerization:** Docker  
 - **Configuration Management:** Ansible  
 - **Authentication:** Azure Service Principal  
-- **Secrets Management:** GitHub Encrypted Secrets  
-
----
-
-# 📦 Immutable Infrastructure Strategy
-
-This project follows immutable deployment principles:
-
-- No manual SSH configuration
-- No in-place infrastructure mutation
-- Infrastructure defined declaratively
-- Containers replaced instead of modified
-- Infrastructure lifecycle fully automated
-
-### Benefits
-
-- Eliminates configuration drift
-- Predictable deployments
-- Safer rollback strategy
-- Reduced operational risk
-- Complete auditability
+- **Secret Management:** GitHub Encrypted Secrets  
 
 ---
 
 # 🔐 Security & Best Practices
 
-- Azure authentication via Service Principal
 - No credentials stored in source code
-- Encrypted GitHub secrets
-- Network Security Group rules defined via Terraform
-- Separation of infrastructure and application workflows
-- Idempotent infrastructure provisioning
+- Azure authentication via Service Principal
+- SSH key-based VM authentication
+- DockerHub credentials encrypted
+- Network Security Groups defined via Terraform
+- Cross-pipeline secret propagation
+- Idempotent infrastructure updates
 
 ---
 
 # 📊 Engineering Highlights
 
-- Designed modular Terraform infrastructure
+- Designed modular Terraform-based Azure infrastructure
 - Implemented dual-pipeline CI/CD architecture
-- Integrated Docker build lifecycle into application workflow
-- Automated VM provisioning using cloud-init
-- Achieved full environment lifecycle automation
-- Applied Infrastructure as Code best practices
-- Enabled stateless, container-based deployments
-- Reduced manual operational effort to zero
+- Integrated Docker image lifecycle into automated workflow
+- Automated VM bootstrapping using cloud-init
+- Enabled full environment lifecycle management
+- Achieved zero manual deployment effort
+- Ensured deterministic and reproducible infrastructure provisioning
+- Implemented secure secret handling across pipelines
 
 ---
 
 # 🎯 Objective
 
-The goal of this project is to demonstrate practical DevOps engineering skills by combining:
+This project demonstrates practical DevOps engineering capabilities by integrating:
 
-- Infrastructure automation
+- Infrastructure as Code
 - Cloud networking design
-- CI/CD best practices
+- CI/CD automation
 - Containerized application deployment
-- Secure cloud authentication
+- Secure authentication practices
 - Immutable infrastructure strategy
 
-This reflects a real-world production deployment model.
+It reflects a real-world production deployment model rather than an academic implementation.
 
 ---
 
@@ -205,11 +264,12 @@ This reflects a real-world production deployment model.
 - Infrastructure as Code (IaC)
 - Continuous Integration
 - Continuous Deployment
-- Cloud Resource Lifecycle Management
 - Immutable Infrastructure
 - Separation of Concerns in CI/CD
+- Secure Secret Management
 - Automation-First Engineering
 - Environment Reproducibility
+- Declarative Infrastructure Design
 
 ---
 
@@ -220,15 +280,15 @@ This reflects a real-world production deployment model.
 ├── ansible/                   # Configuration management
 ├── app/                       # Application source code
 ├── .github/workflows/
-│     ├── infrastructure.yml   # Infra pipeline
-│     └── application.yml      # App deployment pipeline
+│     ├── infrastructure.yml   # Infrastructure pipeline
+│     └── application.yml      # Application pipeline
 ├── Dockerfile
 └── README.md
 ```
 
 ---
 
-# 🚀 How to Deploy
+# 🚀 Deployment Commands
 
 ## Infrastructure
 
