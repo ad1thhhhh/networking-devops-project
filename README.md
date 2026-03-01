@@ -1,130 +1,253 @@
-# Azure Cloud Devops Automation
+# ☕ Barista Task List App – Full Cloud Automation on Azure
 
 ## Overview
 
-This project demonstrates an automated cloud deployment workflow on Microsoft Azure using **Terraform** for Infrastructure as Code and **GitHub Actions** for CI/CD automation.
+This project demonstrates a **fully automated cloud framework** for deploying the Barsita Task List App to **Microsoft Azure** using:
 
-The pipeline is responsible for:
+- Infrastructure as Code (**Terraform**)
+- Containerization (**Docker**)
+- CI/CD Automation (**GitHub Actions**)
+- Configuration Management (**Ansible**)
 
-- Provisioning Azure infrastructure using Terraform  
-- Building and pushing a Docker container image  
-- Deploying the containerized application to Azure Cloud  
-- Ensuring consistent and repeatable deployments  
-
-The architecture follows **immutable infrastructure principles**, meaning infrastructure components are replaced rather than modified during updates. This approach improves reliability, reduces configuration drift, and makes rollbacks safer and more predictable.
-
----
-
-## Tech Stack
-
-- Microsoft Azure  
-- Terraform  
-- GitHub Actions  
-- Docker
-- Ansible 
+The system uses **two independent CI/CD pipelines**:
+1. **Infrastructure Pipeline** – Provisions and manages Azure infrastructure  
+2. **Application Deployment Pipeline** – Builds and deploys the containerized application  
+This separation ensures safer releases, better lifecycle control, and production-style deployment architecture.
 
 ---
 
-## Key Features
+## 🏗 Architecture Overview
 
-- Fully automated infrastructure provisioning  
-- Containerized application deployment  
-- CI/CD pipeline triggered on code push  
-- Reproducible and stateless deployments  
-- Infrastructure managed as code  
+### Infrastructure Workflow
+
+1. Triggered on push to main and when changes are detected in ./terraform directory
+2. Uses actions/checkout@v3 to pull the latest code
+3. Uses azure/login@v2 to authenticate Azure credentials
+4. Installs Terraform dynamically in GitHub runner
+5. Initializes backend & downloads provider plugins
+6. Provisions or updates Azure infrastructure
+7. Captures dynamic infrastructure output (VM public IP)
+8. Github secrets are updated with VM public IP for Application Deployment pipeline
+
+
+### Application Workflow
+
+1. Triggered manually or when changes detected in .app/** .ansible/** directory
+2. Uses actions/checkout@v3 to pull latest application code into GitHub runner
+3. Logs into DockerHub using credentials in GitHub secrets
+4. Builds container image from /app directory
+5. Pushes versioned image to DockerHub
+6. Stops and Removes Old Container
+7. Runs new container (Port 80 -> 5000)
+8. Application Live
+
+This architecture enforces **immutable infrastructure** — infrastructure changes are applied declaratively, and application updates are delivered via container replacement rather than manual server modificatio
+
+
+# ☁️ Cloud Infrastructure – Microsoft Azure
+
+All infrastructure is provisioned using Terraform.
+
+## Provisioned Resources
+
+- Azure Resource Group
+- Virtual Network (VNet)
+- Subnet
+- Network Security Group
+- Public IP Address
+- Linux Virtual Machine
+- Cloud-init bootstrap configuration
+
+## VM Bootstrapping
+
+During provisioning:
+
+- Docker Engine is installed automatically
+- Required dependencies are configured
+- VM is prepared to run containerized workloads
+- Application container runs on port `80 → 5000`
 
 ---
 
-## Deployment Flow
+# 🔁 CI/CD Pipeline Architecture
 
-1. Code is pushed to the `main` branch  
-2. GitHub Actions workflow is triggered  
-3. Docker image is built and pushed to Docker Hub  
-4. Terraform provisions or updates Azure resources  
-5. Application is deployed using immutable deployment practices  
+## 1️⃣ Infrastructure Pipeline
 
----
+Triggered when:
+- Changes occur in `/terraform` directory
 
-## System Architecture
+Performs:
 
-```
-                    ┌────────────────────────────┐
-                    │        Developer           │
-                    │       Code Commit          │
-                    └─────────────┬──────────────┘
-                                  │
-                                  ▼
-                    ┌────────────────────────────┐
-                    │      GitHub Repository     │
-                    │        (main branch)       │
-                    └─────────────┬──────────────┘
-                                  │  Webhook Trigger
-                                  ▼
-┌────────────────────────────────────────────────────────────────┐
-│                    GitHub Actions Pipeline                     │
-│----------------------------------------------------------------│
-│  1. Checkout Source Code                                       │
-│  2. Build Docker Image                                         │
-│  3. Push Image to DockerHub                                    │
-│  4. Authenticate with Azure ( Service Principal)         │
-│  5. Terraform Init → Plan → Apply                              │
-└─────────────┬──────────────────────────────────────────────────┘
-              │
-              ▼
-┌────────────────────────────────────────────────────────────────┐
-│                         Microsoft Azure                        │
-│----------------------------------------------------------------│
-│  Resource Group                                                │
-│    ├── Virtual Network                                         │
-│    ├── Subnet                                                  │
-│    ├── Network Security Group                                  │
-│    ├── Public IP                                               │
-│    └── Linux Virtual Machine                                   │
-└─────────────┬──────────────────────────────────────────────────┘
-              │  cloud-init provisioning
-              ▼
-┌────────────────────────────────────────────────────────────────┐
-│                     Virtual Machine Runtime                    │
-│----------------------------------------------------------------│
-│  • Install Docker Engine                                       │
-│  • Pull latest container image                                 │
-│  • Run container (port mapping 80:5000)                        │
-└─────────────┬──────────────────────────────────────────────────┘
-              │
-              ▼
-┌────────────────────────────────────────────────────────────────┐
-│                 Publicly Accessible Application                │
-│                 http://<vm-public-ip>                          │
-└────────────────────────────────────────────────────────────────┘
+```yaml
+1. Checkout repository
+2. Authenticate to Azure (Service Principal)
+3. Terraform init
+4. Terraform validate
+5. Terraform plan
+6. Terraform apply
 ```
 
-## Objective
+### Purpose
 
-The goal of this project is to demonstrate practical DevOps skills by combining cloud infrastructure automation, containerization, and CI/CD into a single streamlined pipeline.
+- Fully automated Azure resource provisioning
+- Idempotent infrastructure updates
+- Version-controlled infrastructure lifecycle
+- Controlled environment creation & destruction
 
----
+Infrastructure can also be destroyed using:
 
-## Engineering Highlights
-
-- Built and managed cloud infrastructure entirely through Terraform configuration files  
-- Developed an automated CI/CD pipeline using GitHub Actions to streamline deployments  
-- Followed immutable infrastructure practices to prevent configuration drift  
-- Configured automated VM initialization with cloud-init scripts  
-- Integrated Docker image build and deployment into the infrastructure workflow  
-- Enabled complete environment lifecycle management using `terraform apply` and `terraform destroy`  
-- Protected sensitive configuration data using encrypted GitHub repository secrets  
-- Created a seamless automation flow from source code push to live deployment  
+```bash
+terraform destroy
+```
 
 ---
 
-## DevOps Principles Applied
+## 2️⃣ Application Deployment Pipeline
 
-- Infrastructure as Code (IaC)  
-- Continuous Integration and Continuous Deployment  
-- Azure Cloud Networking and Resource Architecture  
-- Immutable Deployment Strategy  
-- Container-Based Application Delivery  
-- Automated Infrastructure Provisioning  
-- Cloud Resource Lifecycle and State Management  
+Triggered when:
+- Changes occur in `/app` directory
+- Code is pushed to `main`
+
+Performs:
+
+```yaml
+1. Checkout repository
+2. Build Docker image
+3. Tag image with commit SHA
+4. Push image to Docker Hub
+5. SSH into VM (or use automation)
+6. Pull latest image
+7. Restart container
+```
+
+### Purpose
+
+- Isolated application release cycle
+- Zero manual server updates
+- Stateless container replacement
+- Safe and repeatable deployments
 
 ---
+
+# ⚙️ Technology Stack
+
+- **Cloud Provider:** Microsoft Azure  
+- **Infrastructure as Code:** Terraform  
+- **CI/CD Platform:** GitHub Actions  
+- **Containerization:** Docker  
+- **Configuration Management:** Ansible  
+- **Authentication:** Azure Service Principal  
+- **Secrets Management:** GitHub Encrypted Secrets  
+
+---
+
+# 📦 Immutable Infrastructure Strategy
+
+This project follows immutable deployment principles:
+
+- No manual SSH configuration
+- No in-place infrastructure mutation
+- Infrastructure defined declaratively
+- Containers replaced instead of modified
+- Infrastructure lifecycle fully automated
+
+### Benefits
+
+- Eliminates configuration drift
+- Predictable deployments
+- Safer rollback strategy
+- Reduced operational risk
+- Complete auditability
+
+---
+
+# 🔐 Security & Best Practices
+
+- Azure authentication via Service Principal
+- No credentials stored in source code
+- Encrypted GitHub secrets
+- Network Security Group rules defined via Terraform
+- Separation of infrastructure and application workflows
+- Idempotent infrastructure provisioning
+
+---
+
+# 📊 Engineering Highlights
+
+- Designed modular Terraform infrastructure
+- Implemented dual-pipeline CI/CD architecture
+- Integrated Docker build lifecycle into application workflow
+- Automated VM provisioning using cloud-init
+- Achieved full environment lifecycle automation
+- Applied Infrastructure as Code best practices
+- Enabled stateless, container-based deployments
+- Reduced manual operational effort to zero
+
+---
+
+# 🎯 Objective
+
+The goal of this project is to demonstrate practical DevOps engineering skills by combining:
+
+- Infrastructure automation
+- Cloud networking design
+- CI/CD best practices
+- Containerized application deployment
+- Secure cloud authentication
+- Immutable infrastructure strategy
+
+This reflects a real-world production deployment model.
+
+---
+
+# 🧠 DevOps Principles Demonstrated
+
+- Infrastructure as Code (IaC)
+- Continuous Integration
+- Continuous Deployment
+- Cloud Resource Lifecycle Management
+- Immutable Infrastructure
+- Separation of Concerns in CI/CD
+- Automation-First Engineering
+- Environment Reproducibility
+
+---
+
+# 📂 Repository Structure
+
+```
+├── terraform/                 # Infrastructure configuration
+├── ansible/                   # Configuration management
+├── app/                       # Application source code
+├── .github/workflows/
+│     ├── infrastructure.yml   # Infra pipeline
+│     └── application.yml      # App deployment pipeline
+├── Dockerfile
+└── README.md
+```
+
+---
+
+# 🚀 How to Deploy
+
+## Infrastructure
+
+```bash
+terraform init
+terraform apply
+```
+
+## Destroy Infrastructure
+
+```bash
+terraform destroy
+```
+
+---
+
+# 👤 Author
+
+**Adithya**  
+DevOps & Cloud Automation Engineer  
+
+GitHub: https://github.com/ad1thhhhh
