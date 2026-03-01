@@ -1,8 +1,8 @@
-# ☕ Barista Task List App – Full Cloud Automation on Azure
+#  Barista Task List App – Full Cloud Automation on Azure
 
-## 🚀 Enterprise-Grade DevOps Automation Project
+##  DevOps Automation Project
 
-This project demonstrates a **production-style DevOps architecture** for deploying the **Barista Task List App** to **Microsoft Azure** using:
+This project demonstrates a **Fully automated DevOps architecture** for deploying the **Barista Task List App** to **Microsoft Azure** using:
 
 - Infrastructure as Code (**Terraform**)
 - Containerization (**Docker**)
@@ -30,7 +30,7 @@ The architecture follows **immutable infrastructure principles**:
 
 ---
 
-# ☁️ Cloud Infrastructure – Microsoft Azure
+#  Cloud Infrastructure – Microsoft Azure
 
 All infrastructure is provisioned using Terraform.
 
@@ -41,8 +41,7 @@ All infrastructure is provisioned using Terraform.
 - Subnet  
 - Network Security Group  
 - Public IP Address  
-- Linux Virtual Machine  
-- Cloud-init bootstrap configuration  
+- Linux Virtual Machine   
 
 ## VM Bootstrapping
 
@@ -254,8 +253,7 @@ This project demonstrates practical DevOps engineering capabilities by integrati
 - Containerized application deployment
 - Secure authentication practices
 - Immutable infrastructure strategy
-
-It reflects a real-world production deployment model rather than an academic implementation.
+  
 
 ---
 
@@ -276,13 +274,16 @@ It reflects a real-world production deployment model rather than an academic imp
 # 📂 Repository Structure
 
 ```
-├── terraform/                 # Infrastructure configuration
-├── ansible/                   # Configuration management
-├── app/                       # Application source code
+├── terraform/
+│     └── main.tf              
+├── ansible/
+│     └── playbook.yml
+├── app/
+│     ├── app.py
+│     └── Dockerfile                      
 ├── .github/workflows/
 │     ├── infrastructure.yml   # Infrastructure pipeline
 │     └── application.yml      # Application pipeline
-├── Dockerfile
 └── README.md
 ```
 
@@ -307,7 +308,8 @@ terraform destroy
 
 # 👤 Author
 
-**Adithya**  
-DevOps & Cloud Automation Engineer  
+**Adith Ravi**  
+Student Msc.Cybersecurity
+Dublin Business School, Dublin  
 
 GitHub: https://github.com/ad1thhhhh
